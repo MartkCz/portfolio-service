@@ -1,0 +1,11 @@
+{
+    "name": "bulios/portfolio-service",
+    "require": {
+        "php": ">=8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Api\\Portfolio\\": "src"
+        }
+    }
+}
