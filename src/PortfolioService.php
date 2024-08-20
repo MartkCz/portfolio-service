@@ -3,6 +3,7 @@
 namespace Api\Portfolio;
 
 use App\Portfolio\Transaction;
+use DateTimeInterface;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -33,40 +34,44 @@ final class PortfolioService
 	/**
 	 * @param Transaction[] $transactions
 	 */
-	public function requestTimeSeries(array $transactions): ResponseInterface
+	public function requestTimeSeries(array $transactions, ?DateTimeInterface $portfolioLastUpdate = null): ResponseInterface
 	{
 		return $this->httpClient->request('POST', $this->buildUrl(self::TimeSeriesLink), [
 			'json' => $transactions,
+			'headers' => $this->createHeaders($portfolioLastUpdate),
 		]);
 	}
 
 	/**
 	 * @param Transaction[] $transactions
 	 */
-	public function requestGains(array $transactions): ResponseInterface
+	public function requestGains(array $transactions, ?DateTimeInterface $portfolioLastUpdate = null): ResponseInterface
 	{
 		return $this->httpClient->request('POST', $this->buildUrl(self::GainsLink), [
 			'json' => $transactions,
+			'headers' => $this->createHeaders($portfolioLastUpdate),
 		]);
 	}
 
 	/**
 	 * @param Transaction[] $transactions
 	 */
-	public function requestValue(array $transactions): ResponseInterface
+	public function requestValue(array $transactions, ?DateTimeInterface $portfolioLastUpdate = null): ResponseInterface
 	{
 		return $this->httpClient->request('POST', $this->buildUrl(self::ValueLink), [
 			'json' => $transactions,
+			'headers' => $this->createHeaders($portfolioLastUpdate),
 		]);
 	}
 
 	/**
 	 * @param Transaction[] $transactions
 	 */
-	public function requestPerformance(array $transactions): ResponseInterface
+	public function requestPerformance(array $transactions, ?DateTimeInterface $portfolioLastUpdate = null): ResponseInterface
 	{
 		return $this->httpClient->request('POST', $this->buildUrl(self::PerformanceLink), [
 			'json' => $transactions,
+			'headers' => $this->createHeaders($portfolioLastUpdate),
 		]);
 	}
 
@@ -82,6 +87,20 @@ final class PortfolioService
 		}
 
 		return $url;
+	}
+
+	/**
+	 * @return array<string, string>
+	 */
+	private function createHeaders(?DateTimeInterface $lastUpdate): array
+	{
+		$headers = [];
+
+		if ($lastUpdate) {
+			$headers['X-Last-Update'] = $lastUpdate->format('D, d M Y H:i:s \G\M\T');
+		}
+
+		return $headers;
 	}
 
 }
