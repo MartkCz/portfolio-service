@@ -8,6 +8,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
+ * Dates are in UTC
+ *
  * @phpstan-type Transaction array{ symbol: string, shares: float, investment: float, date: string }
  */
 final class PortfolioService
