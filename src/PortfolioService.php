@@ -38,11 +38,12 @@ final class PortfolioService
 		array $transactions,
 		?DateTimeInterface $portfolioLastUpdate = null,
 		?DateTimeInterface $ifModifiedSince = null,
+		?string $ifNoneMatch = null,
 	): ResponseInterface
 	{
 		return $this->httpClient->request('POST', $this->buildUrl(self::TimeSeriesLink), [
 			'json' => $transactions,
-			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince),
+			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince, $ifNoneMatch),
 		]);
 	}
 
@@ -53,11 +54,12 @@ final class PortfolioService
 		array $transactions,
 		?DateTimeInterface $portfolioLastUpdate = null,
 		?DateTimeInterface $ifModifiedSince = null,
+		?string $ifNoneMatch = null,
 	): ResponseInterface
 	{
 		return $this->httpClient->request('POST', $this->buildUrl(self::GainsLink), [
 			'json' => $transactions,
-			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince),
+			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince, $ifNoneMatch),
 		]);
 	}
 
@@ -68,11 +70,12 @@ final class PortfolioService
 		array $transactions,
 		?DateTimeInterface $portfolioLastUpdate = null,
 		?DateTimeInterface $ifModifiedSince = null,
+		?string $ifNoneMatch = null,
 	): ResponseInterface
 	{
 		return $this->httpClient->request('POST', $this->buildUrl(self::ValueLink), [
 			'json' => $transactions,
-			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince),
+			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince, $ifNoneMatch),
 		]);
 	}
 
@@ -83,11 +86,12 @@ final class PortfolioService
 		array $transactions,
 		?DateTimeInterface $portfolioLastUpdate = null,
 		?DateTimeInterface $ifModifiedSince = null,
+		?string $ifNoneMatch = null,
 	): ResponseInterface
 	{
 		return $this->httpClient->request('POST', $this->buildUrl(self::PerformanceLink), [
 			'json' => $transactions,
-			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince),
+			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince, $ifNoneMatch),
 		]);
 	}
 
@@ -108,7 +112,7 @@ final class PortfolioService
 	/**
 	 * @return array<string, string>
 	 */
-	private function createHeaders(?DateTimeInterface $lastUpdate, ?DateTimeInterface $ifModifiedSince): array
+	private function createHeaders(?DateTimeInterface $lastUpdate, ?DateTimeInterface $ifModifiedSince, ?string $ifNoneMatch): array
 	{
 		$headers = [];
 
@@ -118,6 +122,10 @@ final class PortfolioService
 
 		if ($ifModifiedSince) {
 			$headers['If-Modified-Since'] = $ifModifiedSince->format('D, d M Y H:i:s \G\M\T');
+		}
+
+		if ($ifNoneMatch) {
+			$headers['If-None-Match'] = $ifNoneMatch;
 		}
 
 		return $headers;
