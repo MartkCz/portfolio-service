@@ -34,44 +34,60 @@ final class PortfolioService
 	/**
 	 * @param Transaction[] $transactions
 	 */
-	public function requestTimeSeries(array $transactions, ?DateTimeInterface $portfolioLastUpdate = null): ResponseInterface
+	public function requestTimeSeries(
+		array $transactions,
+		?DateTimeInterface $portfolioLastUpdate = null,
+		?DateTimeInterface $ifModifiedSince = null,
+	): ResponseInterface
 	{
 		return $this->httpClient->request('POST', $this->buildUrl(self::TimeSeriesLink), [
 			'json' => $transactions,
-			'headers' => $this->createHeaders($portfolioLastUpdate),
+			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince),
 		]);
 	}
 
 	/**
 	 * @param Transaction[] $transactions
 	 */
-	public function requestGains(array $transactions, ?DateTimeInterface $portfolioLastUpdate = null): ResponseInterface
+	public function requestGains(
+		array $transactions,
+		?DateTimeInterface $portfolioLastUpdate = null,
+		?DateTimeInterface $ifModifiedSince = null,
+	): ResponseInterface
 	{
 		return $this->httpClient->request('POST', $this->buildUrl(self::GainsLink), [
 			'json' => $transactions,
-			'headers' => $this->createHeaders($portfolioLastUpdate),
+			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince),
 		]);
 	}
 
 	/**
 	 * @param Transaction[] $transactions
 	 */
-	public function requestValue(array $transactions, ?DateTimeInterface $portfolioLastUpdate = null): ResponseInterface
+	public function requestValue(
+		array $transactions,
+		?DateTimeInterface $portfolioLastUpdate = null,
+		?DateTimeInterface $ifModifiedSince = null,
+	): ResponseInterface
 	{
 		return $this->httpClient->request('POST', $this->buildUrl(self::ValueLink), [
 			'json' => $transactions,
-			'headers' => $this->createHeaders($portfolioLastUpdate),
+			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince),
 		]);
 	}
 
 	/**
 	 * @param Transaction[] $transactions
 	 */
-	public function requestPerformance(array $transactions, ?DateTimeInterface $portfolioLastUpdate = null): ResponseInterface
+	public function requestPerformance(
+		array $transactions,
+		?DateTimeInterface $portfolioLastUpdate = null,
+		?DateTimeInterface $ifModifiedSince = null,
+	): ResponseInterface
 	{
 		return $this->httpClient->request('POST', $this->buildUrl(self::PerformanceLink), [
 			'json' => $transactions,
-			'headers' => $this->createHeaders($portfolioLastUpdate),
+			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince),
 		]);
 	}
 
@@ -92,12 +108,16 @@ final class PortfolioService
 	/**
 	 * @return array<string, string>
 	 */
-	private function createHeaders(?DateTimeInterface $lastUpdate): array
+	private function createHeaders(?DateTimeInterface $lastUpdate, ?DateTimeInterface $ifModifiedSince): array
 	{
 		$headers = [];
 
 		if ($lastUpdate) {
 			$headers['X-Last-Update'] = $lastUpdate->format('D, d M Y H:i:s \G\M\T');
+		}
+
+		if ($ifModifiedSince) {
+			$headers['If-Modified-Since'] = $ifModifiedSince->format('D, d M Y H:i:s \G\M\T');
 		}
 
 		return $headers;
