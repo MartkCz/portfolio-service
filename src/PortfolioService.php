@@ -84,12 +84,15 @@ final class PortfolioService
 	 */
 	public function requestPerformance(
 		array $transactions,
+		?PortfolioPerformanceRange $range = null,
 		?DateTimeInterface $portfolioLastUpdate = null,
 		?DateTimeInterface $ifModifiedSince = null,
 		?string $ifNoneMatch = null,
 	): ResponseInterface
 	{
-		return $this->httpClient->request('POST', $this->buildUrl(self::PerformanceLink), [
+		return $this->httpClient->request('POST', $this->buildUrl(self::PerformanceLink, [
+			'range' => $range?->value,
+		]), [
 			'json' => $transactions,
 			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince, $ifNoneMatch),
 		]);
