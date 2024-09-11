@@ -23,9 +23,11 @@ final class PortfolioService extends Service
 	/**
 	 * @param Transaction[] $transactions
 	 */
-	public function timeSeries(array $transactions): ServiceRequest
+	public function timeSeries(array $transactions, ?string $currency = null): ServiceRequest
 	{
-		return $this->requestJson(RequestType::Post, $transactions, self::TimeSeriesLink);
+		return $this->requestJson(RequestType::Post, $transactions, self::TimeSeriesLink, [
+			'currency' => $currency,
+		]);
 	}
 
 	/**
@@ -39,9 +41,11 @@ final class PortfolioService extends Service
 	/**
 	 * @param Transaction[] $transactions
 	 */
-	public function value(array $transactions): ServiceRequest
+	public function value(array $transactions, ?string $currency = null): ServiceRequest
 	{
-		return $this->requestJson(RequestType::Post, $transactions, self::ValueLink);
+		return $this->requestJson(RequestType::Post, $transactions, self::ValueLink, [
+			'currency' => $currency,
+		]);
 	}
 
 	/**
