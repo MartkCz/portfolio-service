@@ -1,7 +1,8 @@
 {
     "name": "bulios/portfolio-service",
     "require": {
-        "php": ">=8.2"
+        "php": ">=8.2",
+		"bulios/api-core": "^1.0.0"
     },
     "autoload": {
         "psr-4": {

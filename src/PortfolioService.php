@@ -2,18 +2,17 @@
 
 namespace Api\Portfolio;
 
+use Api\Core\RequestType;
+use Api\Core\Service;
+use Api\Core\ServiceRequest;
 use App\Portfolio\Transaction;
-use DateTimeInterface;
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * Dates are in UTC
  *
  * @phpstan-type Transaction array{ symbol: string, shares: float, investment: float, date: string }
  */
-final class PortfolioService
+final class PortfolioService extends Service
 {
 
 	public const GainsLink = '/portfolio/gains';
@@ -21,117 +20,38 @@ final class PortfolioService
 	public const ValueLink = '/portfolio/value';
 	public const PerformanceLink = '/portfolio/performance';
 
-	private HttpClientInterface $httpClient;
-
-	public function __construct(
-		private string $baseUrl,
-		?HttpClientInterface $httpClient,
-	)
+	/**
+	 * @param Transaction[] $transactions
+	 */
+	public function timeSeries(array $transactions): ServiceRequest
 	{
-		$this->httpClient = $httpClient ?? HttpClient::create();
+		return $this->requestJson(RequestType::Post, $transactions, self::TimeSeriesLink);
 	}
 
 	/**
 	 * @param Transaction[] $transactions
 	 */
-	public function requestTimeSeries(
-		array $transactions,
-		?DateTimeInterface $portfolioLastUpdate = null,
-		?DateTimeInterface $ifModifiedSince = null,
-		?string $ifNoneMatch = null,
-	): ResponseInterface
+	public function gains(array $transactions): ServiceRequest
 	{
-		return $this->httpClient->request('POST', $this->buildUrl(self::TimeSeriesLink), [
-			'json' => $transactions,
-			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince, $ifNoneMatch),
-		]);
+		return $this->requestJson(RequestType::Post, $transactions, self::GainsLink);
 	}
 
 	/**
 	 * @param Transaction[] $transactions
 	 */
-	public function requestGains(
-		array $transactions,
-		?DateTimeInterface $portfolioLastUpdate = null,
-		?DateTimeInterface $ifModifiedSince = null,
-		?string $ifNoneMatch = null,
-	): ResponseInterface
+	public function value(array $transactions): ServiceRequest
 	{
-		return $this->httpClient->request('POST', $this->buildUrl(self::GainsLink), [
-			'json' => $transactions,
-			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince, $ifNoneMatch),
-		]);
+		return $this->requestJson(RequestType::Post, $transactions, self::ValueLink);
 	}
 
 	/**
 	 * @param Transaction[] $transactions
 	 */
-	public function requestValue(
-		array $transactions,
-		?DateTimeInterface $portfolioLastUpdate = null,
-		?DateTimeInterface $ifModifiedSince = null,
-		?string $ifNoneMatch = null,
-	): ResponseInterface
+	public function performance(array $transactions, ?PortfolioPerformanceRange $range = null): ServiceRequest
 	{
-		return $this->httpClient->request('POST', $this->buildUrl(self::ValueLink), [
-			'json' => $transactions,
-			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince, $ifNoneMatch),
-		]);
-	}
-
-	/**
-	 * @param Transaction[] $transactions
-	 */
-	public function requestPerformance(
-		array $transactions,
-		?PortfolioPerformanceRange $range = null,
-		?DateTimeInterface $portfolioLastUpdate = null,
-		?DateTimeInterface $ifModifiedSince = null,
-		?string $ifNoneMatch = null,
-	): ResponseInterface
-	{
-		return $this->httpClient->request('POST', $this->buildUrl(self::PerformanceLink, [
+		return $this->requestJson(RequestType::Post, $transactions, self::PerformanceLink, [
 			'range' => $range?->value,
-		]), [
-			'json' => $transactions,
-			'headers' => $this->createHeaders($portfolioLastUpdate, $ifModifiedSince, $ifNoneMatch),
 		]);
-	}
-
-	/**
-	 * @param array<string, scalar> $params
-	 */
-	private function buildUrl(string $path, array $params = []): string
-	{
-		$url = $this->baseUrl . $path;
-
-		if (count($params) > 0) {
-			$url .= '?' . http_build_query($params);
-		}
-
-		return $url;
-	}
-
-	/**
-	 * @return array<string, string>
-	 */
-	private function createHeaders(?DateTimeInterface $lastUpdate, ?DateTimeInterface $ifModifiedSince, ?string $ifNoneMatch): array
-	{
-		$headers = [];
-
-		if ($lastUpdate) {
-			$headers['X-Last-Update'] = $lastUpdate->format('D, d M Y H:i:s \G\M\T');
-		}
-
-		if ($ifModifiedSince) {
-			$headers['If-Modified-Since'] = $ifModifiedSince->format('D, d M Y H:i:s \G\M\T');
-		}
-
-		if ($ifNoneMatch) {
-			$headers['If-None-Match'] = $ifNoneMatch;
-		}
-
-		return $headers;
 	}
 
 }
