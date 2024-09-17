@@ -69,11 +69,7 @@ final class PortfolioService extends Service
 			return $response->toArray();
 		}
 
-		if ($code === 400) {
-			throw new InvalidRequestException($response);
-		}
-
-		throw new UnrecoverableRequestException($response);
+		throw InvalidRequestException::create($response);
 	}
 
 	/**
