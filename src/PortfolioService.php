@@ -65,6 +65,10 @@ final class PortfolioService extends Service
 
 		$code = $response->getStatusCode();
 
+		if ($code === 204) {
+			return [];
+		}
+
 		if ($code === 200) {
 			return $response->toArray();
 		}
