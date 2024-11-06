@@ -25,7 +25,7 @@ final class PortfolioService extends Service
 	/**
 	 * @param Transaction[] $transactions
 	 */
-	public function portfolio(array $transactions, int $year, bool $sensitive, ?string $currency = null): ServiceRequest
+	public function dividends(array $transactions, int $year, bool $sensitive, ?string $currency = null): ServiceRequest
 	{
 		return $this->requestJson(RequestType::Post, $transactions, self::DividendsLink, [
 			'year' => $year,
