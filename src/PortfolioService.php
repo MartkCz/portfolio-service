@@ -3,11 +3,9 @@
 namespace Api\Portfolio;
 
 use Api\Core\Exception\InvalidRequestException;
-use Api\Core\Exception\UnrecoverableRequestException;
 use Api\Core\RequestType;
 use Api\Core\Service;
 use Api\Core\ServiceRequest;
-use App\Portfolio\Transaction;
 
 /**
  * Dates are in UTC
@@ -22,6 +20,19 @@ final class PortfolioService extends Service
 	public const ValueLink = '/portfolio/value';
 	public const PerformanceLink = '/portfolio/performance';
 	public const ImportLink = '/portfolio/import';
+	public const DividendsLink = '/portfolio/dividends';
+
+	/**
+	 * @param Transaction[] $transactions
+	 */
+	public function portfolio(array $transactions, int $year, bool $sensitive, ?string $currency = null): ServiceRequest
+	{
+		return $this->requestJson(RequestType::Post, $transactions, self::DividendsLink, [
+			'year' => $year,
+			'sensitive' => $sensitive ? null : 'false',
+			'currency' => $currency,
+		]);
+	}
 
 	/**
 	 * @param Transaction[] $transactions
