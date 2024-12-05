@@ -20,7 +20,9 @@ final class PortfolioService extends Service
 	public const InvestmentTimeSeriesLink = '/portfolio/investment-timeseries';
 	public const ValueLink = '/portfolio/value';
 	public const PerformanceLink = '/portfolio/performance';
+	public const PositionsLink = '/portfolio/positions';
 	public const ImportLink = '/portfolio/import';
+	public const ImportBrokerLink = '/brokers/%s/csv';
 	public const DividendsLink = '/portfolio/dividends';
 
 	/**
@@ -74,6 +76,31 @@ final class PortfolioService extends Service
 	}
 
 	/**
+	 * @return array{ ticker: string, shares: float, value: float|null, date: string, type: 'sell'|'buy' }[]
+	 * @throws InvalidRequestException
+	 */
+	public function importBroker(string $content, string $broker, bool $validate = false): array
+	{
+		$response = $this->requestBody(RequestType::Post, $content, sprintf(self::ImportBrokerLink, $broker), [
+			'validate' => $validate ? '1' : '0',
+		], [
+			'Content-Type' => 'text/csv',
+		])->request();
+
+		$code = $response->getStatusCode();
+
+		if ($code === 204) {
+			return [];
+		}
+
+		if ($code === 200) {
+			return $response->toArray();
+		}
+
+		throw InvalidRequestException::create($response);
+	}
+
+	/**
 	 * @param mixed[] $transactions
 	 * @return array{ symbol: string, shares: float, investment: float, date: string }[]
 	 * @throws InvalidRequestException
@@ -105,6 +132,17 @@ final class PortfolioService extends Service
 	{
 		return $this->requestJson(RequestType::Post, $transactions, self::PerformanceLink, [
 			'range' => $range?->value,
+		]);
+	}
+
+	/**
+	 * @param Transaction[] $transactions
+	 */
+	public function positions(array $transactions, ?string $currency = null, ?string $symbol = null): ServiceRequest
+	{
+		return $this->requestJson(RequestType::Post, $transactions, self::PositionsLink, [
+			'currency' => $currency,
+			'symbol' => $symbol,
 		]);
 	}
 
