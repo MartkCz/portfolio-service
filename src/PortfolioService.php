@@ -17,6 +17,8 @@ final class PortfolioService extends Service
 
 	public const GainsLink = '/portfolio/gains';
 	public const TimeSeriesLink = '/portfolio/timeseries-value';
+
+	public const ComparedTimeSeriesLink = '/portfolio/compared-timeseries';
 	public const InvestmentTimeSeriesLink = '/portfolio/investment-timeseries';
 	public const ValueLink = '/portfolio/value';
 	public const PerformanceLink = '/portfolio/performance';
@@ -43,6 +45,16 @@ final class PortfolioService extends Service
 	public function timeSeries(array $transactions, ?string $currency = null): ServiceRequest
 	{
 		return $this->requestJson(RequestType::Post, $transactions, self::TimeSeriesLink, [
+			'currency' => $currency,
+		]);
+	}
+
+	/**
+	 * @param Transaction[] $transactions
+	 */
+	public function comparedTimeSeries(array $transactions, ?string $currency = null): ServiceRequest
+	{
+		return $this->requestJson(RequestType::Post, $transactions, self::ComparedTimeSeriesLink, [
 			'currency' => $currency,
 		]);
 	}
