@@ -34,7 +34,7 @@ final class PortfolioService extends Service
 	{
 		return $this->requestJson(RequestType::Post, $transactions, self::DividendsLink, [
 			'year' => $year,
-			'sensitive' => $sensitive ? null : 'false',
+			'sensitive' => $sensitive ? 'true' : 'false',
 			'currency' => $currency,
 		]);
 	}
